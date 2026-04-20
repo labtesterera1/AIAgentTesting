@@ -90,15 +90,16 @@
     .ans-exp{font-size:12px;color:#555;margin-top:4px;line-height:1.5;}
 
     /* FLASHCARD PAGE */
-    .fc-card{width:100%;min-height:200px;cursor:pointer;perspective:1000px;margin:12px 0;}
-    .fc-inner{width:100%;min-height:200px;position:relative;transform-style:preserve-3d;transition:transform 0.5s;}
-    .fc-face{position:absolute;width:100%;min-height:200px;backface-visibility:hidden;border-radius:16px;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:20px;text-align:center;}
+    .fc-card{width:100%;cursor:pointer;perspective:1000px;margin:12px 0;}
+    .fc-inner{width:100%;position:relative;transform-style:preserve-3d;transition:transform 0.5s;}
+    .fc-face{position:absolute;top:0;left:0;width:100%;height:100%;backface-visibility:hidden;border-radius:16px;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:20px;text-align:center;box-sizing:border-box;}
     .fc-front{background:var(--dark);color:#fff;}
     .fc-back{background:#fff;border:2px solid var(--dark);transform:rotateY(180deg);}
+    .fc-sizer{visibility:hidden;padding:20px;display:flex;flex-direction:column;align-items:center;text-align:center;min-height:180px;width:100%;box-sizing:border-box;}
     .fc-hint{font-size:10px;opacity:0.4;text-transform:uppercase;letter-spacing:1px;margin-bottom:10px;}
     .fc-q{font-size:16px;font-weight:500;line-height:1.5;}
     .fc-a{font-size:16px;font-weight:500;color:var(--dark);line-height:1.5;}
-    .fc-exp{font-size:12px;color:#666;margin-top:8px;line-height:1.5;}
+    .fc-exp{font-size:13px;color:#555;margin-top:8px;line-height:1.6;}
     .fc-btns{display:flex;gap:10px;justify-content:center;margin-top:4px;}
     .fc-know{padding:11px 24px;background:#e8fdf0;color:#1a7a45;border:1px solid #9FE1CB;border-radius:10px;font-size:14px;cursor:pointer;font-weight:500;}
     .fc-unkn{padding:11px 24px;background:#fde8e8;color:#a81a1a;border:1px solid #f09595;border-radius:10px;font-size:14px;cursor:pointer;font-weight:500;}
@@ -172,7 +173,32 @@
     .note-card.quick{border-left:4px solid #f59e0b;}
     .note-card.daily{border-left:4px solid #10b981;}
     .note-card.study{border-left:4px solid #6366f1;}
-    .note-type-badge{display:inline-block;padding:2px 8px;border-radius:20px;font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:6px;}
+    .note-card.private{border-left:4px solid #dc2626;background:#fff8f8;}
+    .badge-quick{background:#fef3c7;color:#92400e;}
+    .badge-daily{background:#d1fae5;color:#065f46;}
+    .badge-study{background:#ede9fe;color:#4c1d95;}
+    .badge-private{background:#fee2e2;color:#991b1b;}
+
+    /* DOWNLOAD OVERLAY */
+    .dl-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.55);z-index:150;display:flex;align-items:flex-end;justify-content:center;}
+    .dl-sheet{background:#fff;border-radius:20px 20px 0 0;padding:20px;width:100%;max-width:480px;display:flex;flex-direction:column;gap:12px;}
+    .dl-title{font-size:16px;font-weight:600;color:var(--dark);margin-bottom:4px;}
+    .dl-option{display:flex;align-items:center;gap:14px;padding:14px;border:1px solid var(--border);border-radius:12px;cursor:pointer;transition:background 0.15s;}
+    .dl-option:hover{background:#f5f5f0;}
+    .dl-option-icon{font-size:26px;flex-shrink:0;}
+    .dl-option-label{font-size:14px;font-weight:500;color:var(--dark);}
+    .dl-option-desc{font-size:11px;color:var(--muted);margin-top:2px;}
+
+    /* PRIVATE LOCK OVERLAY */
+    .lock-overlay{position:fixed;inset:0;background:rgba(15,15,30,0.92);z-index:120;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;padding:30px;}
+    .lock-card{background:#fff;border-radius:20px;padding:28px 24px;width:100%;max-width:360px;display:flex;flex-direction:column;gap:14px;align-items:center;text-align:center;}
+    .lock-icon{font-size:48px;}
+    .lock-title{font-size:18px;font-weight:700;color:var(--dark);}
+    .lock-sub{font-size:13px;color:var(--muted);line-height:1.5;}
+    .lock-inp{width:100%;padding:12px 14px;border:2px solid var(--border);border-radius:10px;font-size:16px;font-family:inherit;outline:none;text-align:center;letter-spacing:3px;}
+    .lock-inp:focus{border-color:#dc2626;}
+    .lock-btn{width:100%;padding:12px;background:#dc2626;color:#fff;border:none;border-radius:10px;font-size:15px;cursor:pointer;font-family:inherit;font-weight:600;}
+    .lock-cancel{font-size:13px;color:var(--muted);cursor:pointer;text-decoration:underline;}
     .badge-quick{background:#fef3c7;color:#92400e;}
     .badge-daily{background:#d1fae5;color:#065f46;}
     .badge-study{background:#ede9fe;color:#4c1d95;}
@@ -203,12 +229,19 @@
 
 <!-- SETUP SCREEN -->
 <div id="setup">
-  <div class="setup-card">
-    <h2>Setup Groq API Key</h2>
-    <p>Free AI key — no credit card needed.<br>Get it at <strong>console.groq.com</strong> → API Keys → Create</p>
+  <div class="setup-card" style="max-height:90dvh;overflow-y:auto;">
+    <h2>🔑 Setup AI Keys</h2>
+    <p>Add one or more free AI keys. The app will auto-rotate between them when one is rate limited.</p>
+    <label style="font-size:11px;font-weight:600;color:#555;display:block;margin-bottom:4px;">Groq Key <span style="color:#aaa;font-weight:400;">(console.groq.com)</span></label>
     <input type="password" id="api-inp" placeholder="gsk_..." />
+    <label style="font-size:11px;font-weight:600;color:#555;display:block;margin-bottom:4px;">Cerebras Key <span style="color:#aaa;font-weight:400;">(cloud.cerebras.ai)</span></label>
+    <input type="password" id="api-cerebras-inp" placeholder="csk_..." />
+    <label style="font-size:11px;font-weight:600;color:#555;display:block;margin-bottom:4px;">Gemini Key <span style="color:#aaa;font-weight:400;">(aistudio.google.com/apikey)</span></label>
+    <input type="password" id="api-gemini-inp" placeholder="AIza..." />
+    <label style="font-size:11px;font-weight:600;color:#555;display:block;margin-bottom:4px;">Mistral Key <span style="color:#aaa;font-weight:400;">(console.mistral.ai)</span></label>
+    <input type="password" id="api-mistral-inp" placeholder="..." />
     <button onclick="saveKey()">Save & Start</button>
-    <p class="setup-note">Stored only on your device</p>
+    <p class="setup-note">Keys stored only on your device · At least 1 key required</p>
   </div>
 </div>
 
@@ -217,7 +250,7 @@
   <div id="topbar-inner">
     <div>
       <h1>Grammar AI Agent</h1>
-      <p>by Nik — Groq Free</p>
+      <p id="topbar-sub">by Nik — Multi-AI</p>
     </div>
     <div id="topbar-right">
       <div class="lang-pill">
@@ -352,6 +385,12 @@
               <div class="fc-a" id="m-fc-a"></div>
               <div class="fc-exp" id="m-fc-exp"></div>
             </div>
+            <!-- invisible sizer: keeps card tall enough to show back content -->
+            <div class="fc-sizer" id="m-fc-sizer">
+              <div class="fc-hint">answer</div>
+              <div id="m-fc-a-sizer" style="font-size:16px;font-weight:500;line-height:1.5;"></div>
+              <div id="m-fc-exp-sizer" style="font-size:13px;margin-top:8px;line-height:1.6;"></div>
+            </div>
           </div>
         </div>
         <div id="m-fc-btns" style="display:none;" class="fc-btns">
@@ -430,11 +469,11 @@
         <div style="display:flex;flex-direction:column;gap:10px;margin-bottom:10px;">
           <div>
             <div style="font-size:11px;color:var(--muted);margin-bottom:4px;">Date & Time</div>
-            <input type="datetime-local" id="tz-datetime" style="width:100%;padding:9px 12px;border:1px solid var(--border);border-radius:8px;font-size:14px;font-family:inherit;outline:none;" />
+            <input type="datetime-local" id="tz-datetime" onchange="convertTZ()" style="width:100%;padding:9px 12px;border:1px solid var(--border);border-radius:8px;font-size:14px;font-family:inherit;outline:none;" />
           </div>
           <div>
             <div style="font-size:11px;color:var(--muted);margin-bottom:4px;">From Timezone</div>
-            <select id="tz-from" class="ctrl" style="width:100%;">
+            <select id="tz-from" onchange="convertTZ()" class="ctrl" style="width:100%;">
               <option value="Asia/Kolkata">India (IST)</option>
               <option value="UTC">UTC</option>
               <option value="America/New_York">New York (EST)</option>
@@ -449,7 +488,7 @@
           </div>
           <div>
             <div style="font-size:11px;color:var(--muted);margin-bottom:4px;">To Timezone</div>
-            <select id="tz-to" class="ctrl" style="width:100%;">
+            <select id="tz-to" onchange="convertTZ()" class="ctrl" style="width:100%;">
               <option value="UTC">UTC</option>
               <option value="Asia/Kolkata">India (IST)</option>
               <option value="America/New_York">New York (EST)</option>
@@ -467,7 +506,7 @@
           <button class="btn-primary" onclick="convertTZ()">Convert Time</button>
           <button class="btn-secondary" onclick="setNowTZ()">Use Now</button>
         </div>
-        <div id="tz-result" class="output-box" style="margin-top:12px;display:none;"></div>
+        <div id="tz-result" style="margin-top:12px;display:none;background:#f5f5f0;border:1px solid var(--border);border-radius:10px;padding:16px;text-align:center;font-size:14px;line-height:2;color:var(--text);"></div>
       </div>
       <div class="card">
         <h3>World Clock</h3>
@@ -669,10 +708,11 @@
 
     <!-- Sub-tabs -->
     <div style="display:flex;border-bottom:1px solid var(--border);background:#fff;flex-shrink:0;overflow-x:auto;">
-      <button id="nt-all"   onclick="showNotesSub('all')"   style="padding:10px 14px;border:none;border-bottom:2px solid var(--dark);background:transparent;font-size:12px;font-weight:500;color:var(--dark);cursor:pointer;white-space:nowrap;">📋 All</button>
-      <button id="nt-quick" onclick="showNotesSub('quick')" style="padding:10px 14px;border:none;border-bottom:2px solid transparent;background:transparent;font-size:12px;color:var(--muted);cursor:pointer;white-space:nowrap;">⚡ Quick</button>
-      <button id="nt-daily" onclick="showNotesSub('daily')" style="padding:10px 14px;border:none;border-bottom:2px solid transparent;background:transparent;font-size:12px;color:var(--muted);cursor:pointer;white-space:nowrap;">📅 Daily</button>
-      <button id="nt-study" onclick="showNotesSub('study')" style="padding:10px 14px;border:none;border-bottom:2px solid transparent;background:transparent;font-size:12px;color:var(--muted);cursor:pointer;white-space:nowrap;">📚 Study</button>
+      <button id="nt-all"     onclick="showNotesSub('all')"     style="padding:10px 14px;border:none;border-bottom:2px solid var(--dark);background:transparent;font-size:12px;font-weight:500;color:var(--dark);cursor:pointer;white-space:nowrap;">📋 All</button>
+      <button id="nt-quick"   onclick="showNotesSub('quick')"   style="padding:10px 14px;border:none;border-bottom:2px solid transparent;background:transparent;font-size:12px;color:var(--muted);cursor:pointer;white-space:nowrap;">⚡ Quick</button>
+      <button id="nt-daily"   onclick="showNotesSub('daily')"   style="padding:10px 14px;border:none;border-bottom:2px solid transparent;background:transparent;font-size:12px;color:var(--muted);cursor:pointer;white-space:nowrap;">📅 Daily</button>
+      <button id="nt-study"   onclick="showNotesSub('study')"   style="padding:10px 14px;border:none;border-bottom:2px solid transparent;background:transparent;font-size:12px;color:var(--muted);cursor:pointer;white-space:nowrap;">📚 Study</button>
+      <button id="nt-private" onclick="openPrivateTab()"        style="padding:10px 14px;border:none;border-bottom:2px solid transparent;background:transparent;font-size:12px;color:#dc2626;cursor:pointer;white-space:nowrap;font-weight:500;">🔒 Private</button>
     </div>
 
     <!-- Toolbar: search + new note + download -->
@@ -685,13 +725,16 @@
     <div id="notes-stats" style="display:flex;gap:12px;padding:8px 14px;background:#fafaf7;border-bottom:1px solid var(--border);flex-shrink:0;font-size:11px;color:var(--muted);overflow-x:auto;white-space:nowrap;">
       <span id="stat-total">0 notes</span>
       <span>·</span>
-      <span id="stat-quick">⚡ 0 quick</span>
+      <span id="stat-quick">⚡ 0</span>
       <span>·</span>
-      <span id="stat-daily">📅 0 daily</span>
+      <span id="stat-daily">📅 0</span>
       <span>·</span>
-      <span id="stat-study">📚 0 study</span>
-      <span style="margin-left:auto;"><button onclick="downloadAllNotes()" style="border:none;background:transparent;color:var(--muted);font-size:11px;cursor:pointer;">⬇ Download All</button></span>
-      <span><button onclick="downloadNotesJSON()" style="border:none;background:transparent;color:var(--muted);font-size:11px;cursor:pointer;">💾 Backup JSON</button></span>
+      <span id="stat-study">📚 0</span>
+      <span>·</span>
+      <span id="stat-private" style="color:#dc2626;">🔒 0</span>
+      <span style="margin-left:auto;">
+        <button onclick="openDownloadSheet()" style="border:none;background:transparent;color:var(--dark);font-size:11px;cursor:pointer;font-weight:500;padding:2px 8px;border:1px solid var(--border);border-radius:6px;background:#fff;">⬇ Download</button>
+      </span>
     </div>
 
     <!-- Notes list -->
@@ -719,9 +762,10 @@
       <div>
         <div style="font-size:11px;color:var(--muted);margin-bottom:6px;">NOTE TYPE</div>
         <div class="note-tag-sel">
-          <button class="note-tag-opt sel" id="ntype-quick" onclick="selectNoteType('quick',this)">⚡ Quick Note</button>
-          <button class="note-tag-opt" id="ntype-daily" onclick="selectNoteType('daily',this)">📅 Daily Journal</button>
-          <button class="note-tag-opt" id="ntype-study" onclick="selectNoteType('study',this)">📚 Study Note</button>
+          <button class="note-tag-opt sel" id="ntype-quick"   onclick="selectNoteType('quick',this)">⚡ Quick Note</button>
+          <button class="note-tag-opt"     id="ntype-daily"   onclick="selectNoteType('daily',this)">📅 Daily Journal</button>
+          <button class="note-tag-opt"     id="ntype-study"   onclick="selectNoteType('study',this)">📚 Study Note</button>
+          <button class="note-tag-opt"     id="ntype-private" onclick="selectNoteType('private',this)" style="color:#dc2626;border-color:#fca5a5;">🔒 Private</button>
         </div>
       </div>
 
@@ -781,8 +825,101 @@
     </div>
   </div>
 
+  <!-- DOWNLOAD SHEET OVERLAY -->
+  <div class="dl-overlay" id="dl-overlay" style="display:none;" onclick="if(event.target===this)closeDownloadSheet()">
+    <div class="dl-sheet">
+      <div style="display:flex;justify-content:space-between;align-items:center;">
+        <div class="dl-title">⬇ Download Notes</div>
+        <button onclick="closeDownloadSheet()" style="border:none;background:transparent;font-size:22px;cursor:pointer;color:#888;">×</button>
+      </div>
+      <p style="font-size:12px;color:var(--muted);margin-top:-4px;">Choose what to download</p>
+
+      <!-- All notes -->
+      <div class="dl-option" onclick="downloadByType('all')">
+        <div class="dl-option-icon">📋</div>
+        <div>
+          <div class="dl-option-label">All Notes (.txt)</div>
+          <div class="dl-option-desc">Download every note as a readable text file</div>
+        </div>
+      </div>
+
+      <!-- By type -->
+      <div class="dl-option" onclick="downloadByType('quick')">
+        <div class="dl-option-icon">⚡</div>
+        <div>
+          <div class="dl-option-label">Quick Notes only (.txt)</div>
+          <div class="dl-option-desc">Only your quick one-liner notes</div>
+        </div>
+      </div>
+      <div class="dl-option" onclick="downloadByType('daily')">
+        <div class="dl-option-icon">📅</div>
+        <div>
+          <div class="dl-option-label">Daily Journal only (.txt)</div>
+          <div class="dl-option-desc">All your daily journal entries</div>
+        </div>
+      </div>
+      <div class="dl-option" onclick="downloadByType('study')">
+        <div class="dl-option-icon">📚</div>
+        <div>
+          <div class="dl-option-label">Study Notes only (.txt)</div>
+          <div class="dl-option-desc">Grammar rules, tense notes, vocabulary study</div>
+        </div>
+      </div>
+
+      <!-- Multiple select -->
+      <div style="background:#f5f5f0;border-radius:12px;padding:14px;">
+        <div style="font-size:12px;font-weight:600;color:var(--dark);margin-bottom:10px;">📦 Select Multiple Types</div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px;">
+          <label style="display:flex;align-items:center;gap:6px;font-size:13px;cursor:pointer;"><input type="checkbox" id="dlchk-quick" value="quick" style="width:16px;height:16px;"> ⚡ Quick</label>
+          <label style="display:flex;align-items:center;gap:6px;font-size:13px;cursor:pointer;"><input type="checkbox" id="dlchk-daily" value="daily" style="width:16px;height:16px;"> 📅 Daily</label>
+          <label style="display:flex;align-items:center;gap:6px;font-size:13px;cursor:pointer;"><input type="checkbox" id="dlchk-study" value="study" style="width:16px;height:16px;"> 📚 Study</label>
+        </div>
+        <button onclick="downloadMultipleSelected()" style="width:100%;padding:10px;background:var(--dark);color:#fff;border:none;border-radius:9px;font-size:13px;cursor:pointer;font-family:inherit;">Download Selected</button>
+      </div>
+
+      <!-- JSON Backup -->
+      <div class="dl-option" onclick="downloadNotesJSON()" style="border-color:#c4b5fd;">
+        <div class="dl-option-icon">💾</div>
+        <div>
+          <div class="dl-option-label" style="color:#7c3aed;">Full Backup (.json)</div>
+          <div class="dl-option-desc">Complete backup of all notes — can restore later</div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- PRIVATE LOCK OVERLAY (Enter Password) -->
+  <div class="lock-overlay" id="private-lock-overlay" style="display:none;">
+    <div class="lock-card">
+      <div class="lock-icon">🔒</div>
+      <div class="lock-title">Private Notes</div>
+      <div class="lock-sub">Enter your password to access your private notes</div>
+      <input type="password" id="private-pass-inp" class="lock-inp" placeholder="••••••••" maxlength="20" onkeydown="if(event.key==='Enter')unlockPrivate()" />
+      <div id="private-lock-error" style="font-size:12px;color:#dc2626;display:none;">❌ Incorrect password. Try again.</div>
+      <button class="lock-btn" onclick="unlockPrivate()">🔓 Unlock</button>
+      <span class="lock-cancel" onclick="closePrivateLock()">Cancel</span>
+      <div style="margin-top:6px;padding-top:12px;border-top:1px solid var(--border);width:100%;">
+        <button onclick="showChangePasswordPrompt()" style="border:none;background:transparent;color:var(--muted);font-size:11px;cursor:pointer;font-family:inherit;">⚙ Change / Set Password</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- PRIVATE SET PASSWORD OVERLAY -->
+  <div class="lock-overlay" id="private-setpass-overlay" style="display:none;">
+    <div class="lock-card">
+      <div class="lock-icon">🔑</div>
+      <div class="lock-title" id="setpass-title">Set Private Password</div>
+      <div class="lock-sub" id="setpass-sub">Choose a password to protect your private notes. Remember it — there is no recovery option.</div>
+      <input type="password" id="setpass-inp1" class="lock-inp" placeholder="New password" maxlength="20" />
+      <input type="password" id="setpass-inp2" class="lock-inp" placeholder="Confirm password" maxlength="20" onkeydown="if(event.key==='Enter')savePrivatePassword()" />
+      <div id="setpass-error" style="font-size:12px;color:#dc2626;display:none;"></div>
+      <button class="lock-btn" onclick="savePrivatePassword()">✅ Save Password</button>
+      <span class="lock-cancel" onclick="closeSetPassword()">Cancel</span>
+    </div>
+  </div>
+
 </div>
-<div id="bottomnav" style="overflow-x:auto;">
   <button class="bnav-btn active" id="bn-chat" onclick="showPage('chat')"><span class="bi">💬</span>Chat</button>
   <button class="bnav-btn" id="bn-para" onclick="showPage('para')"><span class="bi">✏️</span>Paragraph</button>
   <button class="bnav-btn" id="bn-tense" onclick="showPage('tense')"><span class="bi">📝</span>Exercise</button>
@@ -794,12 +931,17 @@
 
 <script>
   let apiKey = localStorage.getItem('grammar_key') || '';
+  let cerebrasKey = localStorage.getItem('grammar_cerebras_key') || '';
+  let geminiKey = localStorage.getItem('grammar_gemini_key') || '';
+  let mistralKey = localStorage.getItem('grammar_mistral_key') || '';
+  // Track rate-limit cooldowns per provider
+  const providerCooldown = { groq: 0, cerebras: 0, gemini: 0, mistral: 0 };
   let chatHistory = [];
   let lang = 'en';
   let replyMode = 'bilingual';
   let mExData = null, mVocabData = null, mStoryData = null;
   let mSelTense = '';
-  let mFcCards = [], mFcIdx = 0, mFcFlipped = false, mFcKnown = 0;
+  let mFcCards = [], mFcIdx = 0, mFcFlipped = false, mFcKnown = 0, mFcTopic = '';
   let emailType = 'professional';
   let currentEmailData = null;
 
@@ -818,32 +960,76 @@ Rules:
   ];
 
   // ====== INIT ======
-  if (apiKey) {
+  if (apiKey || cerebrasKey || geminiKey || mistralKey) {
     document.getElementById('setup').style.display = 'none';
     addMsg('bot', 'Namaste Nik! 👋\n\nI am your Grammar AI Agent. Ask me anything in English or Hindi!\n\nUse the bottom tabs — Chat, Paragraph, Exercise, Email, Translate, Notes, Copilot.');
   }
   initMTenseButtons();
+  updateTopbarSub();
   setNowTZ();
 
   // ====== SETUP ======
   function saveKey() {
     const k = document.getElementById('api-inp').value.trim();
-    if (!k.startsWith('gsk_')) { alert('Enter a valid Groq key starting with gsk_'); return; }
-    apiKey = k;
-    localStorage.setItem('grammar_key', k);
+    const kC = document.getElementById('api-cerebras-inp').value.trim();
+    const kG = document.getElementById('api-gemini-inp').value.trim();
+    const kM = document.getElementById('api-mistral-inp').value.trim();
+    if (!k && !kC && !kG && !kM) { alert('Please enter at least one API key.'); return; }
+    if (k && !k.startsWith('gsk_')) { alert('Invalid Groq key — must start with gsk_'); return; }
+    if (k) { apiKey = k; localStorage.setItem('grammar_key', k); }
+    if (kC) { cerebrasKey = kC; localStorage.setItem('grammar_cerebras_key', kC); }
+    if (kG) { geminiKey = kG; localStorage.setItem('grammar_gemini_key', kG); }
+    if (kM) { mistralKey = kM; localStorage.setItem('grammar_mistral_key', kM); }
+    updateTopbarSub();
     document.getElementById('setup').style.display = 'none';
     addMsg('bot', 'Namaste Nik! 👋\n\nI am your Grammar AI Agent. Ask me anything in English or Hindi!\n\nUse the tabs below to navigate.');
   }
 
+  function updateTopbarSub() {
+    const count = [apiKey, cerebrasKey, geminiKey, mistralKey].filter(Boolean).length;
+    const el = document.getElementById('topbar-sub');
+    if (el) el.textContent = 'by Nik — ' + count + ' AI Provider' + (count > 1 ? 's' : '');
+  }
+
   function changeKey() {
-    const current = apiKey ? '(current key saved)' : '(no key set)';
-    const newKey = prompt('Enter your new Groq API key ' + current + ':\n\nGet a free key at console.groq.com → API Keys → Create', '');
-    if (newKey === null) return; // cancelled
-    if (!newKey.trim()) { alert('No key entered. Keeping existing key.'); return; }
-    if (!newKey.trim().startsWith('gsk_')) { alert('Invalid key — must start with gsk_\n\nPlease get your key from console.groq.com'); return; }
-    apiKey = newKey.trim();
-    localStorage.setItem('grammar_key', apiKey);
-    alert('✅ API key updated successfully!');
+    // Show a settings overlay for all keys
+    const overlay = document.createElement('div');
+    overlay.id = 'key-settings-overlay';
+    overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:300;display:flex;align-items:center;justify-content:center;padding:20px;';
+    overlay.innerHTML = `
+      <div style="background:#fff;border-radius:16px;padding:24px;width:100%;max-width:380px;max-height:90dvh;overflow-y:auto;">
+        <h2 style="font-size:17px;font-weight:600;margin-bottom:12px;">🔑 Manage API Keys</h2>
+        <label style="font-size:11px;font-weight:600;color:#555;display:block;margin-bottom:4px;">Groq <span style="color:#aaa;font-weight:400;">(console.groq.com)</span></label>
+        <input id="ks-groq" type="password" value="${apiKey}" placeholder="gsk_..." style="width:100%;padding:9px 12px;border:1px solid #e8e8e4;border-radius:8px;font-size:13px;margin-bottom:10px;outline:none;font-family:inherit;"/>
+        <label style="font-size:11px;font-weight:600;color:#555;display:block;margin-bottom:4px;">Cerebras <span style="color:#aaa;font-weight:400;">(cloud.cerebras.ai)</span></label>
+        <input id="ks-cerebras" type="password" value="${cerebrasKey}" placeholder="csk_..." style="width:100%;padding:9px 12px;border:1px solid #e8e8e4;border-radius:8px;font-size:13px;margin-bottom:10px;outline:none;font-family:inherit;"/>
+        <label style="font-size:11px;font-weight:600;color:#555;display:block;margin-bottom:4px;">Gemini <span style="color:#aaa;font-weight:400;">(aistudio.google.com)</span></label>
+        <input id="ks-gemini" type="password" value="${geminiKey}" placeholder="AIza..." style="width:100%;padding:9px 12px;border:1px solid #e8e8e4;border-radius:8px;font-size:13px;margin-bottom:10px;outline:none;font-family:inherit;"/>
+        <label style="font-size:11px;font-weight:600;color:#555;display:block;margin-bottom:4px;">Mistral <span style="color:#aaa;font-weight:400;">(console.mistral.ai)</span></label>
+        <input id="ks-mistral" type="password" value="${mistralKey}" placeholder="..." style="width:100%;padding:9px 12px;border:1px solid #e8e8e4;border-radius:8px;font-size:13px;margin-bottom:12px;outline:none;font-family:inherit;"/>
+        <button onclick="saveKeySettings()" style="width:100%;padding:11px;background:#1a1a2e;color:#fff;border:none;border-radius:8px;font-size:14px;cursor:pointer;margin-bottom:8px;">Save Keys</button>
+        <button onclick="document.getElementById('key-settings-overlay').remove()" style="width:100%;padding:11px;background:transparent;color:#555;border:1px solid #e8e8e4;border-radius:8px;font-size:14px;cursor:pointer;">Cancel</button>
+        <p style="font-size:11px;color:#aaa;text-align:center;margin-top:8px;">Keys stored only on your device</p>
+      </div>`;
+    document.body.appendChild(overlay);
+  }
+
+  function saveKeySettings() {
+    const k = document.getElementById('ks-groq').value.trim();
+    const kC = document.getElementById('ks-cerebras').value.trim();
+    const kG = document.getElementById('ks-gemini').value.trim();
+    const kM = document.getElementById('ks-mistral').value.trim();
+    if (k) { apiKey = k; localStorage.setItem('grammar_key', k); }
+    else { apiKey = ''; localStorage.removeItem('grammar_key'); }
+    if (kC) { cerebrasKey = kC; localStorage.setItem('grammar_cerebras_key', kC); }
+    else { cerebrasKey = ''; localStorage.removeItem('grammar_cerebras_key'); }
+    if (kG) { geminiKey = kG; localStorage.setItem('grammar_gemini_key', kG); }
+    else { geminiKey = ''; localStorage.removeItem('grammar_gemini_key'); }
+    if (kM) { mistralKey = kM; localStorage.setItem('grammar_mistral_key', kM); }
+    else { mistralKey = ''; localStorage.removeItem('grammar_mistral_key'); }
+    updateTopbarSub();
+    document.getElementById('key-settings-overlay').remove();
+    alert('✅ Keys updated successfully!');
   }
 
   // ====== NAVIGATION ======
@@ -866,7 +1052,7 @@ Rules:
         btn.style.fontWeight = s === sub ? '500' : '400';
       }
     });
-    if (sub === 'timezone') updateWorldClock();
+    if (sub === 'timezone') { setNowTZ(); updateWorldClock(); }
   }
 
   function showTr(tab) {
@@ -937,7 +1123,7 @@ Rules:
   async function sendMsg() {
     const inp = document.getElementById('chat-inp');
     const text = inp.value.trim();
-    if (!text || !apiKey) return;
+    if (!text || (!apiKey && !cerebrasKey && !geminiKey && !mistralKey)) return;
     inp.value = ''; inp.style.height = 'auto';
     document.getElementById('send-btn').disabled = true;
     addMsg('user', text);
@@ -981,7 +1167,8 @@ Rules:
 
   async function correctPara() {
     const text = document.getElementById('para-in').value.trim();
-    if (!text || !apiKey) { alert(!apiKey ? 'Set API key first.' : 'Enter a paragraph.'); return; }
+    const noKey = !apiKey && !cerebrasKey && !geminiKey && !mistralKey;
+    if (!text || noKey) { alert(noKey ? 'Please set at least one API key — tap 🔑 Key in the top bar.' : 'Enter a paragraph.'); return; }
     const mode = document.getElementById('para-mode').value;
     const out = document.getElementById('para-out');
     out.textContent = 'Correcting...';
@@ -1023,7 +1210,7 @@ Rules:
   }
 
   async function mGenExercise() {
-    if (!mSelTense || !apiKey) return;
+    if (!mSelTense || (!apiKey && !cerebrasKey && !geminiKey && !mistralKey)) return;
     const btn = document.getElementById('m-gen-btn');
     btn.textContent = 'Generating...'; btn.disabled = true;
     document.getElementById('m-qs-area').style.display = 'none';
@@ -1070,7 +1257,7 @@ Rules:
 
   // ====== FLASHCARDS MOBILE ======
   async function mGenFlashCards() {
-    if (!apiKey) { alert('Set API key first.'); return; }
+    if (!apiKey && !cerebrasKey && !geminiKey && !mistralKey) { alert('Please set at least one API key — tap 🔑 Key in the top bar.'); return; }
     const topic = document.getElementById('m-fc-topic').value;
     document.getElementById('m-fc-loading').style.display = 'block';
     document.getElementById('m-fc-area').style.display = 'none';
@@ -1081,7 +1268,7 @@ Rules:
       ], 2500);
       const data = JSON.parse(reply.replace(/```json|```/g,'').trim());
       mFcCards = data.cards || [];
-      mFcCards._topic = data.topic || topic;
+      mFcTopic = data.topic || topic;
       mFcIdx = 0; mFcFlipped = false; mFcKnown = 0;
       mShowFC();
       document.getElementById('m-fc-area').style.display = 'block';
@@ -1095,20 +1282,29 @@ Rules:
     const c = mFcCards[mFcIdx];
     document.getElementById('m-fc-q').textContent = c.question;
     document.getElementById('m-fc-a').textContent = c.answer;
-    const expEl = document.getElementById('m-fc-exp');
-    expEl.innerHTML = '';
-    if (c.explanation) {
-      const engLine = document.createElement('div');
-      engLine.textContent = c.explanation;
-      engLine.style.cssText = 'font-size:12px;color:#555;margin-top:6px;line-height:1.5;';
-      expEl.appendChild(engLine);
+
+    // Build explanation HTML (shared helper)
+    function buildExpHTML(expEl) {
+      expEl.innerHTML = '';
+      if (c.explanation) {
+        const engLine = document.createElement('div');
+        engLine.textContent = c.explanation;
+        engLine.style.cssText = 'font-size:13px;color:#555;margin-top:6px;line-height:1.6;';
+        expEl.appendChild(engLine);
+      }
+      if (c.explanation_hindi) {
+        const hindiLine = document.createElement('div');
+        hindiLine.textContent = '🇮🇳 ' + c.explanation_hindi;
+        hindiLine.style.cssText = 'font-size:13px;color:#1a6fa8;margin-top:5px;line-height:1.6;font-style:italic;';
+        expEl.appendChild(hindiLine);
+      }
     }
-    if (c.explanation_hindi) {
-      const hindiLine = document.createElement('div');
-      hindiLine.textContent = '🇮🇳 ' + c.explanation_hindi;
-      hindiLine.style.cssText = 'font-size:12px;color:#1a6fa8;margin-top:5px;line-height:1.5;font-style:italic;';
-      expEl.appendChild(hindiLine);
-    }
+    buildExpHTML(document.getElementById('m-fc-exp'));
+
+    // Update invisible sizer so card height fits back-face content
+    document.getElementById('m-fc-a-sizer').textContent = c.answer;
+    buildExpHTML(document.getElementById('m-fc-exp-sizer'));
+
     document.getElementById('m-fc-counter').textContent = 'Card ' + (mFcIdx+1) + ' of ' + mFcCards.length;
     document.getElementById('m-fc-bar').style.width = ((mFcIdx+1)/mFcCards.length*100) + '%';
     document.getElementById('m-fc-score').textContent = '✓ ' + mFcKnown;
@@ -1162,12 +1358,14 @@ Rules:
 
   function mDownloadFlashCards() {
     if (!mFcCards.length) { alert('Generate flashcards first.'); return; }
-    const topic = mFcCards._topic || 'FlashCards';
-    let txt = 'FLASHCARDS: ' + topic + '\n' + '='.repeat(50) + '\n\n';
+    const topic = mFcTopic || 'FlashCards';
+    let txt = 'FLASHCARDS: ' + topic.toUpperCase() + '\n' + '='.repeat(50) + '\n';
+    txt += 'Generated: ' + new Date().toLocaleString('en-IN') + '\n';
+    txt += 'Total Cards: ' + mFcCards.length + '\n' + '='.repeat(50) + '\n\n';
     mFcCards.forEach((c, i) => {
       txt += 'Card ' + (i+1) + '\n';
-      txt += 'Q: ' + c.question + '\n';
-      txt += 'A: ' + c.answer + '\n';
+      txt += 'Q: ' + (c.question || '') + '\n';
+      txt += 'A: ' + (c.answer || '') + '\n';
       if (c.explanation) txt += 'Tip: ' + c.explanation + '\n';
       if (c.explanation_hindi) txt += 'Hindi: ' + c.explanation_hindi + '\n';
       txt += '\n';
@@ -1178,7 +1376,7 @@ Rules:
 
   // ====== VOCAB MOBILE ======
   async function mGenVocab() {
-    if (!apiKey) { alert('Set API key first.'); return; }
+    if (!apiKey && !cerebrasKey && !geminiKey && !mistralKey) { alert('Please set at least one API key — tap 🔑 Key in the top bar.'); return; }
     const level = document.getElementById('m-vocab-level').value;
     document.getElementById('m-vocab-loading').style.display = 'block';
     document.getElementById('m-vocab-list').innerHTML = '';
@@ -1215,7 +1413,7 @@ Rules:
 
   // ====== STORY MOBILE ======
   async function mGenStory() {
-    if (!apiKey) { alert('Set API key first.'); return; }
+    if (!apiKey && !cerebrasKey && !geminiKey && !mistralKey) { alert('Please set at least one API key — tap 🔑 Key in the top bar.'); return; }
     const topic = document.getElementById('m-story-topic').value;
     document.getElementById('m-story-loading').style.display = 'block';
     document.getElementById('m-story-card').style.display = 'none';
@@ -1252,7 +1450,7 @@ Rules:
   async function translateEN() {
     const text = document.getElementById('tr-in').value.trim();
     const out = document.getElementById('tr-out');
-    if (!text || !apiKey) { alert(!apiKey ? 'Set API key first.' : 'Enter text.'); return; }
+    if (!text || (!apiKey && !cerebrasKey && !geminiKey && !mistralKey)) { alert(!apiKey && !cerebrasKey && !geminiKey && !mistralKey ? 'Please set at least one API key.' : 'Enter text.'); return; }
     out.textContent = 'Translating...';
     const mode = document.getElementById('tr-mode').value;
     const modes = {
@@ -1272,7 +1470,7 @@ Rules:
   async function translateHI() {
     const text = document.getElementById('hi2en-in').value.trim();
     const out = document.getElementById('hi2en-out');
-    if (!text || !apiKey) { alert(!apiKey ? 'Set API key first.' : 'Enter Hindi text.'); return; }
+    if (!text || (!apiKey && !cerebrasKey && !geminiKey && !mistralKey)) { alert(!apiKey && !cerebrasKey && !geminiKey && !mistralKey ? 'Please set at least one API key.' : 'Enter Hindi text.'); return; }
     out.textContent = 'Translating...';
     const mode = document.getElementById('hi2en-mode').value;
     const modes = {
@@ -1334,7 +1532,7 @@ Rules:
     const subject = document.getElementById('email-subject-in').value.trim();
     const body = document.getElementById('email-body-in').value.trim();
     if (!body) { alert('Please enter your email content.'); return; }
-    if (!apiKey) { alert('Set API key first.'); return; }
+    if (!apiKey && !cerebrasKey && !geminiKey && !mistralKey) { alert('Please set at least one API key — tap 🔑 Key in the top bar.'); return; }
 
     document.getElementById('email-loading').style.display = 'block';
     document.getElementById('email-results').style.display = 'none';
@@ -1380,6 +1578,7 @@ Return ONLY this JSON:
     const now = new Date();
     const local = new Date(now.getTime() - now.getTimezoneOffset() * 60000).toISOString().slice(0,16);
     document.getElementById('tz-datetime').value = local;
+    convertTZ();
   }
 
   function convertTZ() {
@@ -1387,13 +1586,27 @@ Return ONLY this JSON:
     const fromZone = document.getElementById('tz-from').value;
     const toZone = document.getElementById('tz-to').value;
     const result = document.getElementById('tz-result');
-    if (!dtVal) { alert('Please select a date and time first.'); return; }
+    if (!dtVal) { result.style.display = 'none'; return; }
     try {
       const dt = new Date(dtVal);
-      const opts = { weekday:'long', year:'numeric', month:'long', day:'numeric', hour:'2-digit', minute:'2-digit', hour12:true };
-      const from = new Intl.DateTimeFormat('en-IN', {...opts, timeZone: fromZone}).format(dt);
-      const to = new Intl.DateTimeFormat('en-IN', {...opts, timeZone: toZone}).format(dt);
-      result.textContent = 'From (' + fromZone + '):\n' + from + '\n\nTo (' + toZone + '):\n' + to;
+      const fullOpts = { weekday:'long', year:'numeric', month:'long', day:'numeric', hour:'2-digit', minute:'2-digit', hour12:true };
+      const shortOpts = { hour:'2-digit', minute:'2-digit', hour12:true };
+      const fromFull = new Intl.DateTimeFormat('en-IN', {...fullOpts, timeZone: fromZone}).format(dt);
+      const toFull   = new Intl.DateTimeFormat('en-IN', {...fullOpts, timeZone: toZone}).format(dt);
+      const fromLabel = fromZone.split('/').pop().replace(/_/g,' ');
+      const toLabel   = toZone.split('/').pop().replace(/_/g,' ');
+      result.innerHTML =
+        `<div style="margin-bottom:14px;">
+          <div style="font-size:10px;font-weight:600;letter-spacing:0.8px;text-transform:uppercase;color:var(--muted);margin-bottom:6px;">From · ${fromLabel}</div>
+          <div style="font-size:20px;font-weight:700;color:var(--dark);">${new Intl.DateTimeFormat('en-IN',{...shortOpts,timeZone:fromZone}).format(dt)}</div>
+          <div style="font-size:12px;color:#666;margin-top:3px;">${fromFull}</div>
+        </div>
+        <div style="font-size:22px;color:var(--muted);margin-bottom:14px;">↓</div>
+        <div>
+          <div style="font-size:10px;font-weight:600;letter-spacing:0.8px;text-transform:uppercase;color:var(--muted);margin-bottom:6px;">To · ${toLabel}</div>
+          <div style="font-size:20px;font-weight:700;color:#1a7a45;">${new Intl.DateTimeFormat('en-IN',{...shortOpts,timeZone:toZone}).format(dt)}</div>
+          <div style="font-size:12px;color:#666;margin-top:3px;">${toFull}</div>
+        </div>`;
       result.style.display = 'block';
     } catch(e) { result.textContent = 'Error: ' + e.message; result.style.display = 'block'; }
   }
@@ -1412,13 +1625,13 @@ Return ONLY this JSON:
     if (!grid) return;
     const now = new Date();
     grid.innerHTML = WORLD_CLOCK_ZONES.map(z => {
-      const time = new Intl.DateTimeFormat('en-IN', {hour:'2-digit',minute:'2-digit',hour12:true,timeZone:z.zone}).format(now);
-      const date = new Intl.DateTimeFormat('en-IN', {day:'numeric',month:'short',timeZone:z.zone}).format(now);
-      return `<div style="background:#f9f9f7;border:1px solid var(--border);border-radius:8px;padding:10px;text-align:center;">
-        <div style="font-size:18px;margin-bottom:2px;">${z.flag}</div>
-        <div style="font-size:11px;color:var(--muted);margin-bottom:4px;">${z.name}</div>
-        <div style="font-size:16px;font-weight:600;color:var(--dark);">${time}</div>
-        <div style="font-size:10px;color:var(--muted);margin-top:2px;">${date}</div>
+      const time = new Intl.DateTimeFormat('en-IN', {hour:'2-digit', minute:'2-digit', hour12:true, timeZone:z.zone}).format(now);
+      const date = new Intl.DateTimeFormat('en-IN', {weekday:'short', day:'numeric', month:'short', timeZone:z.zone}).format(now);
+      return `<div style="background:#f9f9f7;border:1px solid var(--border);border-radius:10px;padding:12px 8px;text-align:center;">
+        <div style="font-size:22px;margin-bottom:3px;">${z.flag}</div>
+        <div style="font-size:11px;color:var(--muted);margin-bottom:5px;font-weight:500;">${z.name}</div>
+        <div style="font-size:18px;font-weight:700;color:var(--dark);">${time}</div>
+        <div style="font-size:10px;color:#888;margin-top:3px;">${date}</div>
       </div>`;
     }).join('');
   }
@@ -1434,7 +1647,7 @@ Return ONLY this JSON:
   async function sendCopilot() {
     const text = document.getElementById('copilot-inp').value.trim();
     if (!text) { alert('Please enter a question or message.'); return; }
-    if (!apiKey) { alert('Set your Groq API key first — tap 🔑 Key in the top bar.'); return; }
+    if (!apiKey && !cerebrasKey && !geminiKey && !mistralKey) { alert('Please set at least one API key — tap 🔑 Key in the top bar.'); return; }
     const btn = document.getElementById('copilot-send-btn');
     btn.disabled = true; btn.textContent = 'Thinking...';
     document.getElementById('copilot-loading').style.display = 'block';
@@ -1473,6 +1686,7 @@ Rules:
   let currentNoteTags = [];
   let currentNoteType = 'quick';
   let lastAIResult = '';
+  let privateUnlocked = false;
 
   function saveNotesToStorage() {
     localStorage.setItem('grammar_notes', JSON.stringify(notesData));
@@ -1494,13 +1708,96 @@ Rules:
     return d.toLocaleDateString('en-IN', {day:'numeric', month:'short', year:'numeric'}) + ', ' + time;
   }
 
+  // ---- PRIVATE TAB PASSWORD ----
+  function openPrivateTab() {
+    const hasPass = !!localStorage.getItem('grammar_private_pass');
+    if (!hasPass) {
+      // No password set yet — prompt to set one
+      document.getElementById('setpass-title').textContent = 'Set Private Password';
+      document.getElementById('setpass-sub').textContent = 'No password set yet. Choose a password to protect your private notes.';
+      document.getElementById('setpass-inp1').value = '';
+      document.getElementById('setpass-inp2').value = '';
+      document.getElementById('setpass-error').style.display = 'none';
+      document.getElementById('private-setpass-overlay').style.display = 'flex';
+      return;
+    }
+    if (privateUnlocked) {
+      // Already unlocked this session
+      showNotesSub('private');
+      return;
+    }
+    // Show lock screen
+    document.getElementById('private-pass-inp').value = '';
+    document.getElementById('private-lock-error').style.display = 'none';
+    document.getElementById('private-lock-overlay').style.display = 'flex';
+    setTimeout(() => document.getElementById('private-pass-inp').focus(), 200);
+  }
+
+  function unlockPrivate() {
+    const inp = document.getElementById('private-pass-inp').value;
+    const saved = localStorage.getItem('grammar_private_pass');
+    if (inp === saved) {
+      privateUnlocked = true;
+      document.getElementById('private-lock-overlay').style.display = 'none';
+      document.getElementById('private-pass-inp').value = '';
+      showNotesSub('private');
+    } else {
+      document.getElementById('private-lock-error').style.display = 'block';
+      document.getElementById('private-pass-inp').value = '';
+      document.getElementById('private-pass-inp').focus();
+    }
+  }
+
+  function closePrivateLock() {
+    document.getElementById('private-lock-overlay').style.display = 'none';
+    document.getElementById('private-pass-inp').value = '';
+    document.getElementById('private-lock-error').style.display = 'none';
+  }
+
+  function showChangePasswordPrompt() {
+    document.getElementById('private-lock-overlay').style.display = 'none';
+    document.getElementById('setpass-title').textContent = 'Change Password';
+    document.getElementById('setpass-sub').textContent = 'Enter a new password for your private notes.';
+    document.getElementById('setpass-inp1').value = '';
+    document.getElementById('setpass-inp2').value = '';
+    document.getElementById('setpass-error').style.display = 'none';
+    document.getElementById('private-setpass-overlay').style.display = 'flex';
+    setTimeout(() => document.getElementById('setpass-inp1').focus(), 200);
+  }
+
+  function savePrivatePassword() {
+    const p1 = document.getElementById('setpass-inp1').value;
+    const p2 = document.getElementById('setpass-inp2').value;
+    const errEl = document.getElementById('setpass-error');
+    if (!p1 || p1.length < 4) { errEl.textContent = '⚠ Password must be at least 4 characters.'; errEl.style.display = 'block'; return; }
+    if (p1 !== p2) { errEl.textContent = '⚠ Passwords do not match. Try again.'; errEl.style.display = 'block'; return; }
+    localStorage.setItem('grammar_private_pass', p1);
+    privateUnlocked = true;
+    document.getElementById('private-setpass-overlay').style.display = 'none';
+    showNotesSub('private');
+  }
+
+  function closeSetPassword() {
+    document.getElementById('private-setpass-overlay').style.display = 'none';
+  }
+
+  // Lock private tab when switching away
+  function lockPrivateOnLeave(sub) {
+    if (currentNotesSub === 'private' && sub !== 'private') {
+      privateUnlocked = false;
+    }
+  }
+
+  // ---- NOTES SUB TABS ----
   function showNotesSub(sub) {
+    lockPrivateOnLeave(sub);
     currentNotesSub = sub;
-    ['all','quick','daily','study'].forEach(s => {
+    ['all','quick','daily','study','private'].forEach(s => {
       const btn = document.getElementById('nt-' + s);
       if (!btn) return;
-      btn.style.borderBottom = s === sub ? '2px solid var(--dark)' : '2px solid transparent';
-      btn.style.color = s === sub ? 'var(--dark)' : 'var(--muted)';
+      const isPrivate = s === 'private';
+      btn.style.borderBottom = s === sub ? '2px solid ' + (isPrivate ? '#dc2626' : 'var(--dark)') : '2px solid transparent';
+      btn.style.color = s === sub ? (isPrivate ? '#dc2626' : 'var(--dark)') : (isPrivate ? '#dc2626' : 'var(--muted)');
       btn.style.fontWeight = s === sub ? '500' : '400';
     });
     renderNotes();
@@ -1509,12 +1806,16 @@ Rules:
   function renderNotes(filterText) {
     const list = document.getElementById('notes-list');
     const empty = document.getElementById('notes-empty-msg');
+
+    // In "All" tab, never show private notes — private only shows in Private tab
     let notes = [...notesData].sort((a, b) => b.updatedAt - a.updatedAt);
+    if (currentNotesSub === 'all') {
+      notes = notes.filter(n => n.type !== 'private');
+    } else {
+      notes = notes.filter(n => n.type === currentNotesSub);
+    }
 
-    // Filter by sub-tab type
-    if (currentNotesSub !== 'all') notes = notes.filter(n => n.type === currentNotesSub);
-
-    // Filter by search text
+    // Filter by search
     if (filterText && filterText.trim()) {
       const q = filterText.toLowerCase();
       notes = notes.filter(n =>
@@ -1528,16 +1829,19 @@ Rules:
 
     if (!notes.length) {
       empty.style.display = 'block';
+      empty.innerHTML = currentNotesSub === 'private'
+        ? '<div style="font-size:40px;margin-bottom:12px;">🔒</div><div style="font-weight:500;margin-bottom:6px;">No private notes yet</div><div style="font-size:12px;">Tap <strong>+</strong> and choose 🔒 Private type</div>'
+        : '<div style="font-size:40px;margin-bottom:12px;">📝</div><div style="font-weight:500;margin-bottom:6px;">No notes yet</div><div style="font-size:12px;">Tap <strong>+</strong> to create your first note</div>';
       list.innerHTML = '';
       return;
     }
     empty.style.display = 'none';
 
-    // Group by date for Daily notes, flat for others
     const typeConfig = {
-      quick: {badge:'badge-quick', label:'⚡ Quick', cls:'quick'},
-      daily: {badge:'badge-daily', label:'📅 Daily', cls:'daily'},
-      study: {badge:'badge-study', label:'📚 Study', cls:'study'},
+      quick:   {badge:'badge-quick',   label:'⚡ Quick',   cls:'quick'},
+      daily:   {badge:'badge-daily',   label:'📅 Daily',   cls:'daily'},
+      study:   {badge:'badge-study',   label:'📚 Study',   cls:'study'},
+      private: {badge:'badge-private', label:'🔒 Private', cls:'private'},
     };
 
     list.innerHTML = notes.map(n => {
@@ -1556,7 +1860,7 @@ Rules:
             ${isLong ? `<button class="note-btn" onclick="toggleNoteExpand('${n.id}',this)">▼ Read more</button>` : ''}
             <button class="note-btn" onclick="openNoteEditor('${n.id}')">✏️ Edit</button>
             <button class="note-btn" onclick="copyNoteText('${n.id}')">Copy</button>
-            <button class="note-btn" onclick="sendNoteToChat('${n.id}')">💬 To Chat</button>
+            ${n.type !== 'private' ? `<button class="note-btn" onclick="sendNoteToChat('${n.id}')">💬 Chat</button>` : ''}
             <button class="note-btn danger" onclick="deleteNote('${n.id}')">🗑</button>
           </div>
         </div>`;
@@ -1575,14 +1879,16 @@ Rules:
   }
 
   function updateNotesStats() {
-    const total = notesData.length;
+    const total = notesData.filter(n => n.type !== 'private').length;
     const quick = notesData.filter(n => n.type === 'quick').length;
     const daily = notesData.filter(n => n.type === 'daily').length;
     const study = notesData.filter(n => n.type === 'study').length;
+    const priv  = notesData.filter(n => n.type === 'private').length;
     document.getElementById('stat-total').textContent = total + ' note' + (total !== 1 ? 's' : '');
-    document.getElementById('stat-quick').textContent = '⚡ ' + quick + ' quick';
-    document.getElementById('stat-daily').textContent = '📅 ' + daily + ' daily';
-    document.getElementById('stat-study').textContent = '📚 ' + study + ' study';
+    document.getElementById('stat-quick').textContent = '⚡ ' + quick;
+    document.getElementById('stat-daily').textContent = '📅 ' + daily;
+    document.getElementById('stat-study').textContent = '📚 ' + study;
+    document.getElementById('stat-private').textContent = '🔒 ' + priv;
   }
 
   function searchNotes() {
@@ -1595,24 +1901,21 @@ Rules:
     currentNoteTags = [];
     currentNoteType = 'quick';
 
-    // Reset editor
     document.getElementById('note-title-inp').value = '';
     document.getElementById('note-content-inp').value = '';
     document.getElementById('note-char-count').textContent = '0 words';
     document.getElementById('note-ai-result').style.display = 'none';
     document.getElementById('note-ai-loading').style.display = 'none';
 
-    // Reset type buttons
     document.querySelectorAll('.note-tag-opt[id^="ntype-"]').forEach(b => b.classList.remove('sel'));
     document.getElementById('ntype-quick').classList.add('sel');
-
-    // Reset tag buttons
     document.querySelectorAll('#tag-options .note-tag-opt').forEach(b => b.classList.remove('sel'));
 
     if (id) {
-      // Edit existing
       const note = notesData.find(n => n.id === id);
       if (!note) return;
+      // If editing private note, ensure unlocked
+      if (note.type === 'private' && !privateUnlocked) { alert('Please unlock Private tab first.'); return; }
       document.getElementById('editor-title-label').textContent = 'Edit Note';
       document.getElementById('delete-note-btn').style.display = 'inline-block';
       document.getElementById('note-title-inp').value = note.title || '';
@@ -1620,20 +1923,21 @@ Rules:
       currentNoteType = note.type || 'quick';
       currentNoteTags = [...(note.tags || [])];
 
-      // Set type button
       document.querySelectorAll('.note-tag-opt[id^="ntype-"]').forEach(b => b.classList.remove('sel'));
       const typeBtn = document.getElementById('ntype-' + currentNoteType);
       if (typeBtn) typeBtn.classList.add('sel');
 
-      // Set tag buttons
       document.querySelectorAll('#tag-options .note-tag-opt').forEach(b => {
-        const tag = b.textContent.trim();
-        if (currentNoteTags.includes(tag)) b.classList.add('sel');
+        if (currentNoteTags.includes(b.textContent.trim())) b.classList.add('sel');
       });
-
       updateNoteWordCount();
     } else {
-      // New note
+      // New note — pre-select Private if in private tab
+      if (currentNotesSub === 'private') {
+        currentNoteType = 'private';
+        document.querySelectorAll('.note-tag-opt[id^="ntype-"]').forEach(b => b.classList.remove('sel'));
+        document.getElementById('ntype-private').classList.add('sel');
+      }
       document.getElementById('editor-title-label').textContent = 'New Note';
       document.getElementById('delete-note-btn').style.display = 'none';
     }
@@ -1667,8 +1971,7 @@ Rules:
   function updateNoteWordCount() {
     const t = document.getElementById('note-content-inp').value.trim();
     const words = t ? t.split(/\s+/).length : 0;
-    const chars = t.length;
-    document.getElementById('note-char-count').textContent = words + ' words · ' + chars + ' chars';
+    document.getElementById('note-char-count').textContent = words + ' words · ' + t.length + ' chars';
   }
 
   document.getElementById('note-content-inp').addEventListener('input', updateNoteWordCount);
@@ -1680,16 +1983,11 @@ Rules:
 
     const now = Date.now();
     if (currentNoteId) {
-      // Update existing
       const idx = notesData.findIndex(n => n.id === currentNoteId);
-      if (idx !== -1) {
-        notesData[idx] = { ...notesData[idx], title, content, type: currentNoteType, tags: currentNoteTags, updatedAt: now };
-      }
+      if (idx !== -1) notesData[idx] = { ...notesData[idx], title, content, type: currentNoteType, tags: currentNoteTags, updatedAt: now };
     } else {
-      // New note
       notesData.unshift({ id: getNoteId(), title, content, type: currentNoteType, tags: currentNoteTags, createdAt: now, updatedAt: now });
     }
-
     saveNotesToStorage();
     closeNoteEditor();
     renderNotes(document.getElementById('notes-search').value);
@@ -1714,47 +2012,39 @@ Rules:
   function copyNoteText(id) {
     const note = notesData.find(n => n.id === id);
     if (!note) return;
-    const text = (note.title ? note.title + '\n\n' : '') + note.content;
-    navigator.clipboard.writeText(text);
+    navigator.clipboard.writeText((note.title ? note.title + '\n\n' : '') + note.content);
   }
 
   function sendNoteToChat(id) {
     const note = notesData.find(n => n.id === id);
-    if (!note) return;
-    const text = (note.title ? note.title + '\n\n' : '') + note.content;
+    if (!note || note.type === 'private') return;
     showPage('chat');
-    document.getElementById('chat-inp').value = 'Please check my English and improve this text:\n\n' + text;
+    document.getElementById('chat-inp').value = 'Please check my English and improve this text:\n\n' + (note.title ? note.title + '\n\n' : '') + note.content;
   }
 
   // ---- AI NOTE ACTIONS ----
   async function aiNoteAction(action) {
     const content = document.getElementById('note-content-inp').value.trim();
     if (!content) { alert('Write something in the note first.'); return; }
-    if (!apiKey) { alert('Set your Groq API key first.'); return; }
+    if (!apiKey && !cerebrasKey && !geminiKey && !mistralKey) { alert('Please set at least one API key — tap 🔑 Key in the top bar.'); return; }
 
     const prompts = {
-      improve: { label: '✨ Improved English', sys: 'You are an expert English editor.', user: 'Improve the English grammar, clarity, and flow of this text. Keep the same meaning. Show only the improved version:\n\n' + content },
-      summarise: { label: '📝 Summary', sys: 'You are a concise summariser.', user: 'Summarise this text into 3-5 clear bullet points. Be brief and informative:\n\n' + content },
-      translate: { label: '🇮🇳 Hindi Translation', sys: 'You are a Hindi-English translator.', user: 'Translate this English text into simple, natural Hindi:\n\n' + content },
-      explain: { label: '💡 Explanation', sys: 'You are a helpful teacher.', user: 'Explain this text in very simple English, as if explaining to a beginner. Use short sentences:\n\n' + content },
+      improve:   { label:'✨ Improved English', sys:'You are an expert English editor.', user:'Improve the English grammar, clarity, and flow of this text. Keep the same meaning. Show only the improved version:\n\n' + content },
+      summarise: { label:'📝 Summary',          sys:'You are a concise summariser.',     user:'Summarise this text into 3-5 clear bullet points. Be brief and informative:\n\n' + content },
+      translate: { label:'🇮🇳 Hindi Translation', sys:'You are a Hindi-English translator.', user:'Translate this English text into simple, natural Hindi:\n\n' + content },
+      explain:   { label:'💡 Explanation',       sys:'You are a helpful teacher.',        user:'Explain this text in very simple English, as if explaining to a beginner. Use short sentences:\n\n' + content },
     };
 
     const p = prompts[action];
     document.getElementById('note-ai-loading').style.display = 'block';
     document.getElementById('note-ai-result').style.display = 'none';
-
     try {
-      const reply = await callGroq([
-        { role: 'system', content: p.sys },
-        { role: 'user', content: p.user }
-      ], 1500);
+      const reply = await callGroq([{role:'system',content:p.sys},{role:'user',content:p.user}], 1500);
       lastAIResult = reply;
       document.getElementById('note-ai-label').textContent = p.label;
       document.getElementById('note-ai-text').textContent = reply;
       document.getElementById('note-ai-result').style.display = 'block';
-    } catch(e) {
-      alert('AI Error: ' + e.message);
-    }
+    } catch(e) { alert('AI Error: ' + e.message); }
     document.getElementById('note-ai-loading').style.display = 'none';
   }
 
@@ -1765,32 +2055,74 @@ Rules:
     document.getElementById('note-ai-result').style.display = 'none';
   }
 
-  // ---- DOWNLOAD ----
-  function downloadAllNotes() {
-    if (!notesData.length) { alert('No notes to download.'); return; }
-    const sorted = [...notesData].sort((a,b) => b.updatedAt - a.updatedAt);
+  // ---- DYNAMIC DOWNLOAD SHEET ----
+  function openDownloadSheet() {
+    // Reset checkboxes
+    ['quick','daily','study'].forEach(t => {
+      const el = document.getElementById('dlchk-' + t);
+      if (el) el.checked = false;
+    });
+    document.getElementById('dl-overlay').style.display = 'flex';
+  }
+
+  function closeDownloadSheet() {
+    document.getElementById('dl-overlay').style.display = 'none';
+  }
+
+  function buildNotesTxt(notes, label) {
+    if (!notes.length) { alert('No notes found for this selection.'); return null; }
+    const typeLabels = { quick:'⚡ QUICK NOTE', daily:'📅 DAILY JOURNAL', study:'📚 STUDY NOTE', private:'🔒 PRIVATE NOTE' };
     let txt = 'MY NOTES — Grammar AI Agent\n';
     txt += '='.repeat(50) + '\n';
+    txt += 'Filter: ' + label + '\n';
     txt += 'Exported: ' + new Date().toLocaleString('en-IN') + '\n';
-    txt += 'Total: ' + notesData.length + ' notes\n';
+    txt += 'Total: ' + notes.length + ' note' + (notes.length !== 1 ? 's' : '') + '\n';
     txt += '='.repeat(50) + '\n\n';
-
-    const typeLabels = { quick:'⚡ QUICK NOTE', daily:'📅 DAILY JOURNAL', study:'📚 STUDY NOTE' };
-    sorted.forEach((n, i) => {
+    notes.forEach((n, i) => {
       txt += (i+1) + '. ' + (typeLabels[n.type]||'NOTE') + '\n';
       txt += 'Date: ' + formatNoteDate(n.updatedAt) + '\n';
       if (n.title) txt += 'Title: ' + n.title + '\n';
       if (n.tags && n.tags.length) txt += 'Tags: ' + n.tags.join(', ') + '\n';
-      txt += '-'.repeat(30) + '\n';
-      txt += n.content + '\n';
-      txt += '\n' + '='.repeat(50) + '\n\n';
+      txt += '-'.repeat(30) + '\n' + n.content + '\n\n' + '='.repeat(50) + '\n\n';
     });
-    dlTxt(txt, 'my-notes-' + new Date().toLocaleDateString('en-IN').replace(/\//g,'-') + '.txt');
+    return txt;
+  }
+
+  function downloadByType(type) {
+    closeDownloadSheet();
+    const sorted = [...notesData].sort((a,b) => b.updatedAt - a.updatedAt);
+    const filtered = type === 'all'
+      ? sorted.filter(n => n.type !== 'private')   // All never includes private
+      : sorted.filter(n => n.type === type);
+
+    // Private download requires unlock
+    if (type === 'private' && !privateUnlocked) {
+      alert('Please unlock the Private tab first before downloading private notes.');
+      return;
+    }
+
+    const labels = { all:'All Notes', quick:'Quick Notes', daily:'Daily Journal', study:'Study Notes', private:'Private Notes' };
+    const txt = buildNotesTxt(filtered, labels[type] || type);
+    if (txt) dlTxt(txt, 'notes-' + type + '-' + new Date().toLocaleDateString('en-IN').replace(/\//g,'-') + '.txt');
+  }
+
+  function downloadMultipleSelected() {
+    const types = ['quick','daily','study'].filter(t => document.getElementById('dlchk-' + t)?.checked);
+    if (!types.length) { alert('Please select at least one type.'); return; }
+    closeDownloadSheet();
+    const sorted = [...notesData].sort((a,b) => b.updatedAt - a.updatedAt);
+    const filtered = sorted.filter(n => types.includes(n.type));
+    const label = types.map(t => ({quick:'Quick', daily:'Daily', study:'Study'}[t])).join(' + ');
+    const txt = buildNotesTxt(filtered, label);
+    if (txt) dlTxt(txt, 'notes-selected-' + new Date().toLocaleDateString('en-IN').replace(/\//g,'-') + '.txt');
   }
 
   function downloadNotesJSON() {
-    if (!notesData.length) { alert('No notes to backup.'); return; }
-    const json = JSON.stringify(notesData, null, 2);
+    closeDownloadSheet();
+    // JSON backup excludes private notes for safety — private stays local
+    const exportData = notesData.filter(n => n.type !== 'private');
+    if (!exportData.length) { alert('No notes to backup (private notes are excluded from JSON backup for security).'); return; }
+    const json = JSON.stringify(exportData, null, 2);
     const blob = new Blob([json], {type:'application/json'});
     const a = document.createElement('a');
     a.href = URL.createObjectURL(blob);
@@ -1823,16 +2155,104 @@ Rules:
     URL.revokeObjectURL(a.href);
   }
 
+  // ====== MULTI-PROVIDER AI ======
+  async function callAI(messages, maxTokens) {
+    const now = Date.now();
+    const providers = [
+      {
+        name: 'groq', key: apiKey,
+        available: !!apiKey && now > providerCooldown.groq,
+        call: async (msgs, mt) => {
+          const res = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+            method: 'POST',
+            headers: {'Content-Type':'application/json','Authorization':'Bearer ' + apiKey},
+            body: JSON.stringify({model:'llama-3.3-70b-versatile', max_tokens: mt||1200, messages: msgs})
+          });
+          if (res.status === 429) { providerCooldown.groq = Date.now() + 65000; throw new Error('rate_limit'); }
+          const data = await res.json();
+          if (data.error) throw new Error(data.error.message);
+          return data.choices[0].message.content;
+        }
+      },
+      {
+        name: 'cerebras', key: cerebrasKey,
+        available: !!cerebrasKey && now > providerCooldown.cerebras,
+        call: async (msgs, mt) => {
+          const res = await fetch('https://api.cerebras.ai/v1/chat/completions', {
+            method: 'POST',
+            headers: {'Content-Type':'application/json','Authorization':'Bearer ' + cerebrasKey},
+            body: JSON.stringify({model:'llama-3.3-70b', max_tokens: mt||1200, messages: msgs})
+          });
+          if (res.status === 429) { providerCooldown.cerebras = Date.now() + 65000; throw new Error('rate_limit'); }
+          const data = await res.json();
+          if (data.error) throw new Error(data.error.message);
+          return data.choices[0].message.content;
+        }
+      },
+      {
+        name: 'gemini', key: geminiKey,
+        available: !!geminiKey && now > providerCooldown.gemini,
+        call: async (msgs, mt) => {
+          // Convert OpenAI-style messages to Gemini format
+          const systemMsg = msgs.find(m => m.role === 'system');
+          const userMsgs = msgs.filter(m => m.role !== 'system');
+          const geminiMsgs = userMsgs.map(m => ({
+            role: m.role === 'assistant' ? 'model' : 'user',
+            parts: [{text: m.content}]
+          }));
+          const body = { contents: geminiMsgs, generationConfig: { maxOutputTokens: mt||1200 } };
+          if (systemMsg) body.systemInstruction = { parts: [{text: systemMsg.content}] };
+          const res = await fetch('https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=' + geminiKey, {
+            method: 'POST',
+            headers: {'Content-Type':'application/json'},
+            body: JSON.stringify(body)
+          });
+          if (res.status === 429) { providerCooldown.gemini = Date.now() + 65000; throw new Error('rate_limit'); }
+          const data = await res.json();
+          if (data.error) throw new Error(data.error.message);
+          return data.candidates[0].content.parts[0].text;
+        }
+      },
+      {
+        name: 'mistral', key: mistralKey,
+        available: !!mistralKey && now > providerCooldown.mistral,
+        call: async (msgs, mt) => {
+          const res = await fetch('https://api.mistral.ai/v1/chat/completions', {
+            method: 'POST',
+            headers: {'Content-Type':'application/json','Authorization':'Bearer ' + mistralKey},
+            body: JSON.stringify({model:'mistral-small-latest', max_tokens: mt||1200, messages: msgs})
+          });
+          if (res.status === 429) { providerCooldown.mistral = Date.now() + 65000; throw new Error('rate_limit'); }
+          const data = await res.json();
+          if (data.error) throw new Error(data.error.message || data.error);
+          return data.choices[0].message.content;
+        }
+      }
+    ];
+
+    const available = providers.filter(p => p.available);
+    if (!available.length) {
+      // Find when the next provider resets
+      const nextReset = Math.min(...providers.filter(p => p.key).map(p => providerCooldown[p.name]));
+      const waitSecs = Math.max(0, Math.ceil((nextReset - Date.now()) / 1000));
+      throw new Error('All AI providers are rate limited. Please wait ~' + waitSecs + 's and try again.');
+    }
+
+    for (const provider of available) {
+      try {
+        const result = await provider.call(messages, maxTokens);
+        return result;
+      } catch(e) {
+        if (e.message === 'rate_limit') { continue; } // try next
+        throw e; // real error, don't retry
+      }
+    }
+    throw new Error('All available AI providers failed. Please try again shortly.');
+  }
+
+  // Keep callGroq as alias for backward compatibility
   async function callGroq(messages, maxTokens) {
-    const res = await fetch('https://api.groq.com/openai/v1/chat/completions', {
-      method: 'POST',
-      headers: {'Content-Type':'application/json','Authorization':'Bearer ' + apiKey},
-      body: JSON.stringify({model:'llama-3.3-70b-versatile', max_tokens: maxTokens||1200, messages})
-    });
-    const data = await res.json();
-    if (data.error) throw new Error(data.error.message);
-    if (!data.choices?.[0]?.message?.content) throw new Error('No response from Groq.');
-    return data.choices[0].message.content;
+    return callAI(messages, maxTokens);
   }
 </script>
 </body>
